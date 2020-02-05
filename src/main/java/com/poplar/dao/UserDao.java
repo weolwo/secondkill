@@ -10,11 +10,11 @@ import org.apache.ibatis.annotations.Select;
  * by poplar created on 2020/1/31
  */
 @Mapper
-public interface TestDao {
+public interface UserDao {
 
     @Select("select * from user where id = #{id}")
-    public User getById(@Param("id")int id	);
+    public User getViaId(@Param("id") Long id);
 
-    @Insert("insert into user(id, name)values(#{id}, #{name})")
-    public int insert(User user);
+    @Select("select * from user where id = #{id} and password = #{password}")
+    public User login(@Param("id") Long id,@Param("password") String password);
 }

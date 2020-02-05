@@ -1,25 +1,27 @@
 package com.poplar.bean;
 
+import lombok.Data;
+
+import java.util.Date;
+
 /**
- * by poplar created on 2020/1/31
+ * by poplar created on 2020/2/5
  */
+@Data
 public class User {
-    private int id;
-    private String name;
+    private Long id;
 
-    public int getId() {
-        return id;
-    }
+    private String nickname;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    private String password;
 
-    public String getName() {
-        return name;
-    }
+    private String salt;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    private String head;
+
+    private Date registerDate;
+
+    private Date lastLoginDate;
+
+    private Integer loginCount;
 }
