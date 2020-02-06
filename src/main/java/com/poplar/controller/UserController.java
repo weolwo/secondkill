@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -31,9 +32,9 @@ public class UserController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public ResultEnvelope do_login(@Valid LoginVo loginVo) {
+    public ResultEnvelope do_login(HttpServletResponse response, @Valid LoginVo loginVo) {
         log.info(loginVo.toString());
-        if (userService.login(loginVo)) {
+        if (userService.login(response, loginVo)) {
             return ResultEnvelope.success("登录成功");
         }
         return ResultEnvelope.failure();

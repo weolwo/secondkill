@@ -16,5 +16,5 @@ public interface UserDao {
     public User getViaId(@Param("id") Long id);
 
     @Select("select * from user where id = #{id} and password = #{password}")
-    public User login(@Param("id") Long id,@Param("password") String password);
+    User login(@Param("id") Long id, @Param("password") String password);
 }
