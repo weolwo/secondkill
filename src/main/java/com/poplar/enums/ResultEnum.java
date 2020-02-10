@@ -16,6 +16,10 @@ public enum ResultEnum {
     BIND_ERROR(4001, "参数校验异常：%s"),
 
     SERVER_ERROR(5001, "服务器异常"),
+
+    SEDKILL_OVER(5002, "秒杀活动已经结束"),
+
+    REPEAT_SEDKILL(5002, "你已经秒杀过了"),
     ;
 
     private Integer code;
@@ -30,7 +34,7 @@ public enum ResultEnum {
     public ResultEnvelope fillArgs(Object... args) {
         int code = this.code;
         String message = String.format(this.message, args);
-        return new ResultEnvelope(code,message);
+        return new ResultEnvelope(code, message);
     }
 
     public Integer getCode() {

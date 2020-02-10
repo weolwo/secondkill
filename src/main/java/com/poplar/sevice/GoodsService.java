@@ -1,5 +1,6 @@
 package com.poplar.sevice;
 
+import com.poplar.bean.SedKillGoods;
 import com.poplar.dao.GoodsDao;
 import com.poplar.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,15 @@ public class GoodsService {
         return goodsDao.listGoodsVo();
     }
 
-    public GoodsVo getGoodsVoByGoodsId(Long id) {
-        return goodsDao.getGoodsVoByGoodsId(id);
+    public GoodsVo getGoodsVoByGoodsId(Long goodsId) {
+        return goodsDao.getGoodsVoByGoodsId(goodsId);
+    }
+
+    public int reduceStock(Long goodsId) {
+        return goodsDao.reduceStock(goodsId);
+    }
+
+    public int getStockCount(Long goodsId) {
+        return goodsDao.getStockCount(goodsId);
     }
 }
