@@ -1,5 +1,6 @@
 package com.poplar.controller;
 
+import com.poplar.bean.User;
 import com.poplar.sevice.UserService;
 import com.poplar.util.ResultEnvelope;
 import com.poplar.vo.LoginVo;
@@ -32,11 +33,16 @@ public class UserController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public ResultEnvelope do_login(HttpServletResponse response, @Valid LoginVo loginVo) {
+    public ResultEnvelope<String> do_login(HttpServletResponse response, @Valid LoginVo loginVo) {
         log.info(loginVo.toString());
-        if (userService.login(response, loginVo)) {
-            return ResultEnvelope.success("登录成功");
-        }
-        return ResultEnvelope.failure();
+        String login = userService.login(response, loginVo);
+        return ResultEnvelope.success(login);
+       // return ResultEnvelope.failure();
+    }
+
+    @RequestMapping(value = "/info")
+    @ResponseBody
+    public ResultEnvelope<User> info(User user){
+        return ResultEnvelope.success(user);
     }
 }

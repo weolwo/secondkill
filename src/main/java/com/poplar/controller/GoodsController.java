@@ -20,6 +20,7 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+    //QPS 578 50000 Q
     @GetMapping("/to_list")
     public String to_list(Model model, User user) {
         List<GoodsVo> goodsVoList = goodsService.listGoodsVo();
