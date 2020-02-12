@@ -33,11 +33,12 @@ public class UserController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public ResultEnvelope<String> do_login(HttpServletResponse response, @Valid LoginVo loginVo) {
+    public ResultEnvelope do_login(HttpServletResponse response, @Valid LoginVo loginVo) {
         log.info(loginVo.toString());
-        String login = userService.login(response, loginVo);
-        return ResultEnvelope.success(login);
-       // return ResultEnvelope.failure();
+        if (userService.login(response, loginVo)) {
+            return ResultEnvelope.success("登录成功");
+        }
+        return ResultEnvelope.failure();
     }
 
     @RequestMapping(value = "/info")

@@ -31,6 +31,7 @@ public class SedKillController {
     @Autowired
     private OrderService orderService;
 
+    /*QPS 692 50000*/
     @RequestMapping(value = "/do_sedKill")
     public String do_sedKill(Model model, @RequestParam("goodsId") Long goodsId, User user) {
         if (user == null) {

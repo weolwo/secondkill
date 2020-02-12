@@ -1,15 +1,26 @@
 package com.poplar.controller;
 
 import com.poplar.bean.User;
+import com.poplar.redis.GoodsDetailPrefix;
+import com.poplar.redis.GoodsListPrefix;
+import com.poplar.redis.RedisHelper;
 import com.poplar.sevice.GoodsService;
 import com.poplar.vo.GoodsVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring5.context.webflux.SpringWebFluxContext;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 
@@ -20,19 +31,49 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+    @Autowired
+    RedisHelper redisHelper;
+
+    @Autowired
+    ThymeleafViewResolver thymeleafViewResolver;
+
+    @Autowired
+    HttpServletRequest request;
+
+    @Autowired
+    HttpServletResponse response;
+
     //QPS 578 50000 Q
-    @GetMapping("/to_list")
+    //页面静态化缓存
+    @GetMapping(value = "/to_list", produces = "text/html")
+    @ResponseBody
     public String to_list(Model model, User user) {
-        List<GoodsVo> goodsVoList = goodsService.listGoodsVo();
         model.addAttribute("user", user);
+        String html = redisHelper.get(GoodsListPrefix.getGoodsList, "", String.class);
+        if (StringUtils.isNotEmpty(html)) {
+            return html;
+        }
+        List<GoodsVo> goodsVoList = goodsService.listGoodsVo();
         model.addAttribute("goodsList", goodsVoList);
-        return "goods_list";
+        //return "goods_list";
+        //手动渲染
+        WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_list", context);
+        if (StringUtils.isNotEmpty(html)) {
+            redisHelper.set(GoodsListPrefix.getGoodsList, "", html);
+        }
+        return html;
     }
 
-    @GetMapping("/to_detail/{id}")
+    @GetMapping(value = "/to_detail/{id}", produces = "text/html")
+    @ResponseBody
     public String to_detail(Model model, User user, @PathVariable("id") Long id) {
-        final GoodsVo goods = goodsService.getGoodsVoByGoodsId(id);
         model.addAttribute("user", user);
+        String html = redisHelper.get(GoodsDetailPrefix.getGoodsDetail, "", String.class);
+        if (StringUtils.isNotEmpty(html)) {
+            return html;
+        }
+        final GoodsVo goods = goodsService.getGoodsVoByGoodsId(id);
         model.addAttribute("goods", goods);
         int status = 0;
         int remainTime = 0;
@@ -50,6 +91,12 @@ public class GoodsController {
         }
         model.addAttribute("status", status);
         model.addAttribute("remainTime", remainTime);
-        return "goods_detail";
+        WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", context);
+        if (StringUtils.isNotEmpty(html)) {
+            redisHelper.set(GoodsDetailPrefix.getGoodsDetail, "" + id, html);
+        }
+        // return "goods_detail";
+        return html;
     }
 }

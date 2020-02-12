@@ -28,23 +28,23 @@ public class UserService {
     @Autowired
     private RedisHelper redisHelper;
 
-    public String login(HttpServletResponse response, LoginVo loginVo) {
+    public boolean login(HttpServletResponse response, LoginVo loginVo) {
         Long mobile = Long.parseLong(loginVo.getMobile());
         String password = loginVo.getPassword();
         User user = userDao.getViaId(mobile);
-       /* if (user == null) {
+        if (user == null) {
             return false;
-        }*/
+        }
         String salt = user.getSalt();
         String passwordMd5 = MD5Util.formPassToDBPass(password, salt);
         User login = userDao.login(mobile, passwordMd5);
-        /*if (login == null) {
+        if (login == null) {
             return false;
-        }*/
+        }
         //生成分布式session
         String taken = UUIDUtil.uuid();
         addCookie(response, taken, user);
-        return taken;
+        return true;
     }
 
     private void addCookie(HttpServletResponse response, String taken, User user) {
