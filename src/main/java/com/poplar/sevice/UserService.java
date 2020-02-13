@@ -61,8 +61,32 @@ public class UserService {
         if (user == null) {
             throw new GlobalException(ResultEnum.USER_NOT_EXIST);
         }
-        redisHelper.set(UserIdPrefix.getByUserId, "" + userId, User.class);
+        redisHelper.set(UserIdPrefix.getByUserId, "" + userId, user);
         return user;
+    }
+
+    /**
+     * 更新密码
+     *
+     * @param token
+     * @param newPassword
+     * @return
+     */
+    public boolean update(String token, String newPassword, Long userId) {
+        User user = getViaId(userId);
+        if (user == null) {
+            throw new GlobalException(ResultEnum.USER_NOT_EXIST);
+        }
+
+        //只更新需要更新的字段
+        User u = new User();
+        u.setPassword(MD5Util.formPassToDBPass(newPassword, user.getSalt()));
+        userDao.update(u);
+        //删除缓存中的旧数据
+        user.setPassword(u.getPassword());
+        redisHelper.delete(UserIdPrefix.getByUserId, "" + userId);
+        redisHelper.set(UserPrefix.taken, token, user);
+        return true;
     }
 
     private void addCookie(HttpServletResponse response, String taken, User user) {

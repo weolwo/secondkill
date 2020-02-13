@@ -7,6 +7,7 @@ import com.poplar.enums.ResultEnum;
 import com.poplar.sevice.GoodsService;
 import com.poplar.sevice.OrderService;
 import com.poplar.sevice.SedKillService;
+import com.poplar.util.ResultEnvelope;
 import com.poplar.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * by poplar created on 2020/2/9
@@ -33,7 +35,30 @@ public class SedKillController {
 
     /*QPS 692 50000*/
     @RequestMapping(value = "/do_sedKill")
-    public String do_sedKill(Model model, @RequestParam("goodsId") Long goodsId, User user) {
+    @ResponseBody
+    public ResultEnvelope do_sedKill(Model model, @RequestParam("goodsId") Long goodsId, User user) {
+        if (user == null) {
+            return ResultEnvelope.failure(ResultEnum.USER_NOT_LOGIN);
+        }
+        GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
+        //判断商品库存
+        int stock = goodsService.getStockCount(goodsId);
+        if (stock <= 0) {
+            return ResultEnvelope.failure(ResultEnum.SEDKILL_OVER);
+        }
+        //判断是否重复秒杀
+        SedKillOrder order = orderService.getSedKillOrderByUserIdGoodsId(user.getId(), goodsId);
+        if (order != null) {
+            return ResultEnvelope.failure(ResultEnum.REPEAT_SEDKILL);
+        }
+        //下订单，写入库存
+        OrderInfo orderInfo = sedKillService.sedKill(user, goodsVo);
+        return ResultEnvelope.success(orderInfo);
+    }
+
+    /*QPS 692 50000*/
+    @RequestMapping(value = "/do_sedKill2")
+    public String do_sedKill2(Model model, @RequestParam("goodsId") Long goodsId, User user) {
         if (user == null) {
             return "login";
         }

@@ -20,7 +20,12 @@ public enum ResultEnum {
     SEDKILL_OVER(5002, "秒杀活动已经结束"),
 
     REPEAT_SEDKILL(5003, "你已经秒杀过了"),
+
     USER_NOT_EXIST(600, "用户不存在"),
+
+    USER_NOT_LOGIN(601, "用户不未登录"),
+
+    ORDER_NOT_EXIST(701, "订单不存在"),
     ;
 
     private Integer code;
