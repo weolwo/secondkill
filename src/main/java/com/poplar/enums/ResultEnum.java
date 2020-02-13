@@ -19,7 +19,8 @@ public enum ResultEnum {
 
     SEDKILL_OVER(5002, "秒杀活动已经结束"),
 
-    REPEAT_SEDKILL(5002, "你已经秒杀过了"),
+    REPEAT_SEDKILL(5003, "你已经秒杀过了"),
+    USER_NOT_EXIST(600, "用户不存在"),
     ;
 
     private Integer code;

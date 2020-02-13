@@ -2,7 +2,10 @@ package com.poplar.sevice;
 
 import com.poplar.bean.User;
 import com.poplar.dao.UserDao;
+import com.poplar.enums.ResultEnum;
+import com.poplar.exception.GlobalException;
 import com.poplar.redis.RedisHelper;
+import com.poplar.redis.UserIdPrefix;
 import com.poplar.redis.UserPrefix;
 import com.poplar.util.MD5Util;
 import com.poplar.util.UUIDUtil;
@@ -28,10 +31,11 @@ public class UserService {
     @Autowired
     private RedisHelper redisHelper;
 
+    //缓存用户对象到redis
     public boolean login(HttpServletResponse response, LoginVo loginVo) {
         Long mobile = Long.parseLong(loginVo.getMobile());
         String password = loginVo.getPassword();
-        User user = userDao.getViaId(mobile);
+        User user = getViaId(mobile);
         if (user == null) {
             return false;
         }
@@ -45,6 +49,20 @@ public class UserService {
         String taken = UUIDUtil.uuid();
         addCookie(response, taken, user);
         return true;
+    }
+
+    //缓存用户对象到redis https://blog.csdn.net/tTU1EvLDeLFq5btqiK/article/details/78693323
+    public User getViaId(Long userId) {
+        User user = redisHelper.get(UserIdPrefix.getByUserId, "" + userId, User.class);
+        if (user != null) {
+            return user;
+        }
+        user = userDao.getViaId(userId);
+        if (user == null) {
+            throw new GlobalException(ResultEnum.USER_NOT_EXIST);
+        }
+        redisHelper.set(UserIdPrefix.getByUserId, "" + userId, User.class);
+        return user;
     }
 
     private void addCookie(HttpServletResponse response, String taken, User user) {
