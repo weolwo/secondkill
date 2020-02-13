@@ -41,6 +41,15 @@ public class RedisHelper {
         return "OK".equalsIgnoreCase(res);
     }
 
+    //根据key删除缓存
+    public boolean delete(KeyPrefix prefix, String key) {
+        Jedis jedis = jedisPool.getResource();
+        String realKey = prefix.getPrefix() + key;
+        Long del = jedis.del(realKey);
+        jedis.close();
+        return del > 0;
+    }
+
     public <T> boolean exist(KeyPrefix prefix, String key) {
         Jedis jedis = jedisPool.getResource();
         String realKey = prefix.getPrefix() + key;
