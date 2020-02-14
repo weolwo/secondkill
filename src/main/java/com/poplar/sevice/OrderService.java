@@ -4,6 +4,8 @@ import com.poplar.bean.OrderInfo;
 import com.poplar.bean.SedKillOrder;
 import com.poplar.bean.User;
 import com.poplar.dao.OrderDao;
+import com.poplar.redis.OrderPrefix;
+import com.poplar.redis.RedisHelper;
 import com.poplar.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,13 @@ public class OrderService {
     @Autowired
     private OrderDao orderDao;
 
+    @Autowired
+    RedisHelper redisHelper;
+
+    //查询订单时去redis
     public SedKillOrder getSedKillOrderByUserIdGoodsId(Long userId, Long goodsId) {
-        return orderDao.getSedKillOrderByUserIdGoodsId(userId, goodsId);
+        return redisHelper.get(OrderPrefix.getByUserIdAndGoodsId, userId + "_" + goodsId, SedKillOrder.class);
+        //return orderDao.getSedKillOrderByUserIdGoodsId(userId, goodsId);
     }
 
     public OrderInfo getByOrderId(Long orderId) {
@@ -47,6 +54,7 @@ public class OrderService {
         sedKillOrder.setGoodsId(goods.getId());
         sedKillOrder.setOrderId(orderId);
         orderDao.insertSedKillOrder(sedKillOrder);
+        redisHelper.set(OrderPrefix.getByUserIdAndGoodsId, user.getId() + "_" + goods.getId(), sedKillOrder);
         return orderInfo;
     }
 }

@@ -30,7 +30,7 @@ public class SedKillController {
     @Autowired
     private OrderService orderService;
 
-    /*QPS 692 50000*/
+    /*QPS 692 50000*/ /*QPS 836 50000*/
     @PostMapping(value = "/do_sedKill")
     @ResponseBody
     public ResultEnvelope<OrderInfo> do_sedKill(@RequestParam("goodsId") Long goodsId, User user) {
