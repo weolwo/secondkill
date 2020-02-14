@@ -23,7 +23,7 @@ public class UserUtil {
             User user = new User();
             user.setId(13000000000L + i);
             user.setLoginCount(1);
-            user.setNickname("user" + i);
+            user.setNickName("user" + i);
             user.setRegisterDate(new Date());
             user.setSalt("1a2b3c");
             user.setPassword(MD5Util.inputPassToDbPass("123456", user.getSalt()));

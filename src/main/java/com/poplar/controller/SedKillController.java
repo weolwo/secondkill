@@ -12,10 +12,7 @@ import com.poplar.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * by poplar created on 2020/2/9
@@ -34,9 +31,9 @@ public class SedKillController {
     private OrderService orderService;
 
     /*QPS 692 50000*/
-    @RequestMapping(value = "/do_sedKill")
+    @PostMapping(value = "/do_sedKill")
     @ResponseBody
-    public ResultEnvelope do_sedKill(Model model, @RequestParam("goodsId") Long goodsId, User user) {
+    public ResultEnvelope<OrderInfo> do_sedKill(@RequestParam("goodsId") Long goodsId, User user) {
         if (user == null) {
             return ResultEnvelope.failure(ResultEnum.USER_NOT_LOGIN);
         }
@@ -57,7 +54,7 @@ public class SedKillController {
     }
 
     /*QPS 692 50000*/
-    @RequestMapping(value = "/do_sedKill2")
+    @PostMapping(value = "/do_sedKill2")
     public String do_sedKill2(Model model, @RequestParam("goodsId") Long goodsId, User user) {
         if (user == null) {
             return "login";

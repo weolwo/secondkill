@@ -88,11 +88,11 @@ function getOrderDetail(){
 		data:{
 			orderId:orderId
 		},
-		success:function(data){
-			if(data.code == 0){
-				render(data.data);
+		success:function(result){
+			if(result.code === 0){
+				render(result.data);
 			}else{
-				layer.msg(data.msg);
+				layer.msg(result.message);
 			}
 		},
 		error:function(){

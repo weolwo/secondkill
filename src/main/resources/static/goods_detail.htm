@@ -75,7 +75,7 @@ function doSedKill(){
 			if(result.code == 0){
 				window.location.href="/order_detail.htm?orderId="+result.data.id;
 			}else{
-				layer.msg(result.msg);
+				layer.msg(result.message);
 			}
 		},
 		error:function(){

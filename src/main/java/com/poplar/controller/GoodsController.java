@@ -67,7 +67,7 @@ public class GoodsController {
 
     @GetMapping(value = "/to_detail/{goodsId}")
     @ResponseBody
-    public ResultEnvelope<GoodsDetailVo> to_detail(Model model, User user, @PathVariable("goodsId") Long goodsId) {
+    public ResultEnvelope<GoodsDetailVo> to_detail(User user, @PathVariable("goodsId") Long goodsId) {
         if (user == null) {
             ResultEnvelope.failure(ResultEnum.USER_NOT_LOGIN);
         }
