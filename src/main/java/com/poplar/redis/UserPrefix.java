@@ -5,7 +5,7 @@ package com.poplar.redis;
  */
 public class UserPrefix extends BasePreFix {
 
-    public static final int TAKEN_EXPIRE = 3600 * 24 * 2;
+    public static final int TAKEN_EXPIRE = 3600 * 24 * 15;
 
     public UserPrefix(int expireSeconds, String prefix) {
         super(expireSeconds, prefix);

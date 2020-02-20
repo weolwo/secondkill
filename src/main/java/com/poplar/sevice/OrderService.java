@@ -47,12 +47,13 @@ public class OrderService {
         orderInfo.setCreateDate(new Date());
         orderInfo.setStatus(0);//未支付
         orderInfo.setUserId(user.getId());
-        long orderId = orderDao.insert(orderInfo);
+        orderDao.insert(orderInfo);
 
         SedKillOrder sedKillOrder = new SedKillOrder();
         sedKillOrder.setUserId(user.getId());
         sedKillOrder.setGoodsId(goods.getId());
-        sedKillOrder.setOrderId(orderId);
+        //mybatis会把返回的id赋值到对象上
+        sedKillOrder.setOrderId(orderInfo.getId());
         orderDao.insertSedKillOrder(sedKillOrder);
         redisHelper.set(OrderPrefix.getByUserIdAndGoodsId, user.getId() + "_" + goods.getId(), sedKillOrder);
         return orderInfo;

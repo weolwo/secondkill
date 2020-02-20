@@ -19,7 +19,7 @@
     <script type="text/javascript" src="/js/common.js"></script>
 </head>
 <body>
-<div class="panel panel-default">
+<div class="panel panel-default" >
   <div class="panel-heading">秒杀订单详情</div>
   <table class="table" id="goodslist">
         <tr>  
@@ -88,11 +88,11 @@ function getOrderDetail(){
 		data:{
 			orderId:orderId
 		},
-		success:function(result){
-			if(result.code === 0){
-				render(result.data);
+		success:function(data){
+			if(data.code == 0){
+				render(data.data);
 			}else{
-				layer.msg(result.message);
+				layer.msg(data.message);
 			}
 		},
 		error:function(){

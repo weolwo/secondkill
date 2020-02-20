@@ -13,4 +13,6 @@ public class GoodsListPrefix extends BasePreFix {
 
     public static GoodsListPrefix getGoodsList = new GoodsListPrefix(TAKEN_EXPIRE, "gl");
 
+    public static GoodsListPrefix getGoodsStock = new GoodsListPrefix(0, "gs");
+
 }

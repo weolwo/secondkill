@@ -73,7 +73,7 @@ public class RedisHelper {
         return result;
     }
 
-    private <T> String objectToString(T value) {
+    public  <T> String objectToString(T value) {
         if (value == null) {
             return null;
         }
@@ -89,7 +89,7 @@ public class RedisHelper {
         }
     }
 
-    private <T> T strToObject(String value, Class<T> clazz) {
+    public  <T> T strToObject(String value, Class<T> clazz) {
         if (value == null || value.length() <= 0 || clazz == null) {
             return null;
         } else if (clazz == int.class || clazz == Integer.class) {
