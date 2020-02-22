@@ -2,8 +2,8 @@ package com.poplar.controller;
 
 import com.poplar.bean.User;
 import com.poplar.enums.ResultEnum;
-import com.poplar.redis.GoodsDetailPrefix;
-import com.poplar.redis.GoodsListPrefix;
+import com.poplar.redis.GoodsDetailKey;
+import com.poplar.redis.GoodsListKey;
 import com.poplar.redis.RedisHelper;
 import com.poplar.sevice.GoodsService;
 import com.poplar.util.ResultEnvelope;
@@ -49,7 +49,7 @@ public class GoodsController {
     @ResponseBody
     public String to_list(Model model, User user) {
         model.addAttribute("user", user);
-        String html = redisHelper.get(GoodsListPrefix.getGoodsList, "", String.class);
+        String html = redisHelper.get(GoodsListKey.getGoodsList, "", String.class);
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
@@ -60,7 +60,7 @@ public class GoodsController {
         WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", context);
         if (StringUtils.isNotEmpty(html)) {
-            redisHelper.set(GoodsListPrefix.getGoodsList, "", html);
+            redisHelper.set(GoodsListKey.getGoodsList, "", html);
         }
         return html;
     }
@@ -98,7 +98,7 @@ public class GoodsController {
     @ResponseBody
     public String to_detail2(Model model, User user, @PathVariable("id") Long id) {
         model.addAttribute("user", user);
-        String html = redisHelper.get(GoodsDetailPrefix.getGoodsDetail, "", String.class);
+        String html = redisHelper.get(GoodsDetailKey.getGoodsDetail, "", String.class);
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
@@ -123,7 +123,7 @@ public class GoodsController {
         WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", context);
         if (StringUtils.isNotEmpty(html)) {
-            redisHelper.set(GoodsDetailPrefix.getGoodsDetail, "" + id, html);
+            redisHelper.set(GoodsDetailKey.getGoodsDetail, "" + id, html);
         }
         // return "goods_detail";
         return html;

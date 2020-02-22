@@ -26,6 +26,12 @@ public enum ResultEnum {
     USER_NOT_LOGIN(601, "用户不未登录"),
 
     ORDER_NOT_EXIST(701, "订单不存在"),
+
+    ILLEGALITY_REQUEST(4001, "非法请求"),
+
+    VERIFYCODE_ERROR(4004, "验证码错误"),
+
+    ACCESS_LIMIT_REACHED(6001, "访问达到最大限制次数"),
     ;
 
     private Integer code;

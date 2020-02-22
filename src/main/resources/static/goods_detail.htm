@@ -17,10 +17,23 @@
     <script type="text/javascript" src="/js/md5.min.js"></script>
     <!-- common.js -->
     <script type="text/javascript" src="/js/common.js"></script>
+    <style type="text/css">
+        html,body{
+            height:100%;
+            width:100%;
+        }
+        body{
+            background:url('/img/bg2.jpg') no-repeat;
+            background-size:100% 100%;
+        }
+        #goodslist td{
+            border-top:1px solid #39503f61;
+        }
+    </style>
 </head>
 <body>
 
-<div class="panel panel-default" >
+<div class="panel panel-default" style="height:100%;background-color:rgba(222,222,222,0.8)" >
   <div class="panel-heading">秒杀商品详情</div>
   <div class="panel-body">
   	<span id="userTip"> 您还没有登录，请登陆后再操作<br/></span>
@@ -48,7 +61,13 @@
         		<button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
         		<input type="hidden" name="goodsId"  id="goodsId" />
         	</form>-->
-        	<button class="btn btn-primary btn-block" type="button" id="buyButton"onclick="doSedKill()">立即秒杀</button>
+        	<div class="row">
+        		<div class="form-inline">
+		        	<img id="verifyCodeImg" width="80" height="32"  style="display:none" onclick="refreshVerifyCode()"/>
+		        	<input id="verifyCode"  class="form-control" style="display:none"/>
+		        	<button class="btn btn-primary" type="button" id="buyButton"onclick="getSedKillPath()">立即秒杀</button>
+        		</div>
+        	</div>
         	<input type="hidden" name="goodsId"  id="goodsId" />
         </td>
      </tr>
@@ -69,7 +88,31 @@
 </body>
 <script>
 
-function getSedkillResult(goodsId){
+function getSedKillPath(){
+	var goodsId = $("#goodsId").val();
+	g_showLoading();
+	$.ajax({
+		url:"/sedKill/path",
+		type:"GET",
+		data:{
+			goodsId:goodsId,
+			verifyCode:$("#verifyCode").val()
+		},
+		success:function(data){
+			if(data.code === 0){
+				var path = data.data;
+                doSedKill(path);
+			}else{
+				layer.msg(data.message);
+			}
+		},
+		error:function(){
+			layer.msg("客户端请求有误");
+		}
+	});
+}
+
+function getSedKillResult(goodsId){
 	g_showLoading();
 	$.ajax({
 		url:"/sedKill/result",
@@ -77,15 +120,15 @@ function getSedkillResult(goodsId){
 		data:{
 			goodsId:$("#goodsId").val(),
 		},
-		success:function(res){
-			if(res.code === 0){
-				var result = res.data;
+		success:function(data){
+			if(data.code === 0){
+				var result = data.data;
 				if(result < 0){
 					layer.msg("对不起，秒杀失败");
 				}else if(result === 0){//继续轮询
 					setTimeout(function(){
-                        getSedkillResult(goodsId);
-					}, 500);
+                        getSedKillResult(goodsId);
+					}, 1000);
 				}else{
 					layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
 							function(){
@@ -96,7 +139,7 @@ function getSedkillResult(goodsId){
 							});
 				}
 			}else{
-				layer.msg(res.message);
+				layer.msg(data.message);
 			}
 		},
 		error:function(){
@@ -105,17 +148,17 @@ function getSedkillResult(goodsId){
 	});
 }
 
-function doSedKill(){
+function doSedKill(path){
 	$.ajax({
-		url:"/sedKill/do_sedKill",
+		url:"/sedKill/"+path+"/do_sedKill",
 		type:"POST",
 		data:{
-			goodsId:$("#goodsId").val(),
+			goodsId:$("#goodsId").val()
 		},
 		success:function(data){
-			if(data.code == 0){
+			if(data.code === 0){
 				//window.location.href="/order_detail.htm?orderId="+data.data.id;
-                getSedkillResult($("#goodsId").val());
+                getSedKillResult($("#goodsId").val());
 			}else{
 				layer.msg(data.message);
 			}
@@ -131,6 +174,7 @@ function render(detail){
 	var status = detail.status;
 	var  remainSeconds = detail.remainSeconds;
 	var goods = detail.goods;
+	var user = detail.user;
 	if(user){
 		$("#userTip").hide();
 	}
@@ -138,9 +182,8 @@ function render(detail){
 	$("#goodsImg").attr("src", goods.goodsImg);
 	$("#startTime").text(new Date(goods.startDate).format("yyyy-MM-dd hh:mm:ss"));
 	$("#remainSeconds").val(remainSeconds);
-	$("#goodsId").val(goods.id);	var user = detail.user;
-
-    $("#goodsPrice").text(goods.goodsPrice);
+	$("#goodsId").val(goods.id);
+	$("#goodsPrice").text(goods.goodsPrice);
 	$("#miaoshaPrice").text(goods.price);
 	$("#stockCount").text(goods.stockCount);
 	countDown();
@@ -157,7 +200,7 @@ function getDetail(){
 		url:"/goods/to_detail/"+goodsId,
 		type:"GET",
 		success:function(data){
-			if(data.code == 0){
+			if(data.code === 0){
 				render(data.data);
 			}else{
 				layer.msg(data.message);
@@ -173,7 +216,7 @@ function countDown(){
 	var remainSeconds = $("#remainSeconds").val();
 	var timeout;
 	if(remainSeconds > 0){//秒杀还没开始，倒计时
-		$("#buyButton").attr("disabled", true);
+	   $("#buyButton").attr("disabled", true);
 	   $("#miaoshaTip").html("秒杀倒计时："+remainSeconds+"秒");
 		timeout = setTimeout(function(){
 			$("#countDown").text(remainSeconds - 1);
@@ -186,11 +229,18 @@ function countDown(){
 			clearTimeout(timeout);
 		}
 		$("#miaoshaTip").html("秒杀进行中");
+		$("#verifyCodeImg").attr("src", "/sedKill/verifyCode?goodsId="+$("#goodsId").val());
+		$("#verifyCodeImg").show();
+		$("#verifyCode").show();
 	}else{//秒杀已经结束
 		$("#buyButton").attr("disabled", true);
 		$("#miaoshaTip").html("秒杀已经结束");
+		$("#verifyCodeImg").hide();
+		$("#verifyCode").hide();
 	}
 }
-
+function refreshVerifyCode(){
+	$("#verifyCodeImg").attr("src", "/sedKill/verifyCode?goodsId="+$("#goodsId").val()+"&timestamp="+new Date().getTime());
+}
 </script>
 </html>

@@ -5,8 +5,8 @@ import com.poplar.dao.UserDao;
 import com.poplar.enums.ResultEnum;
 import com.poplar.exception.GlobalException;
 import com.poplar.redis.RedisHelper;
-import com.poplar.redis.UserIdPrefix;
-import com.poplar.redis.UserPrefix;
+import com.poplar.redis.UserIdKey;
+import com.poplar.redis.UserKey;
 import com.poplar.util.MD5Util;
 import com.poplar.util.UUIDUtil;
 import com.poplar.vo.LoginVo;
@@ -26,7 +26,7 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
-    private final static String COOKIE_NAME = "taken";
+    private final static String COOKIE_NAME = "token";
 
     @Autowired
     private RedisHelper redisHelper;
@@ -46,14 +46,14 @@ public class UserService {
             return false;
         }
         //生成分布式session
-        String taken = UUIDUtil.uuid();
-        addCookie(response, taken, user);
+        String token = UUIDUtil.uuid();
+        addCookie(response, token, user);
         return true;
     }
 
     //缓存用户对象到redis https://blog.csdn.net/tTU1EvLDeLFq5btqiK/article/details/78693323
     public User getViaId(Long userId) {
-        User user = redisHelper.get(UserIdPrefix.getByUserId, "" + userId, User.class);
+        User user = redisHelper.get(UserIdKey.getByUserId, "" + userId, User.class);
         if (user != null) {
             return user;
         }
@@ -61,7 +61,7 @@ public class UserService {
         if (user == null) {
             throw new GlobalException(ResultEnum.USER_NOT_EXIST);
         }
-        redisHelper.set(UserIdPrefix.getByUserId, "" + userId, user);
+        redisHelper.set(UserIdKey.getByUserId, "" + userId, user);
         return user;
     }
 
@@ -84,28 +84,28 @@ public class UserService {
         userDao.update(u);
         //删除缓存中的旧数据
         user.setPassword(u.getPassword());
-        redisHelper.delete(UserIdPrefix.getByUserId, "" + userId);
-        redisHelper.set(UserPrefix.taken, token, user);
+        redisHelper.delete(UserIdKey.getByUserId, "" + userId);
+        redisHelper.set(UserKey.token, token, user);
         return true;
     }
 
-    private void addCookie(HttpServletResponse response, String taken, User user) {
-        redisHelper.set(UserPrefix.taken, taken, user);
-        Cookie cookie = new Cookie(COOKIE_NAME, taken);
+    private void addCookie(HttpServletResponse response, String token, User user) {
+        redisHelper.set(UserKey.token, token, user);
+        Cookie cookie = new Cookie(COOKIE_NAME, token);
         cookie.setPath("/");
-        cookie.setMaxAge(UserPrefix.TAKEN_EXPIRE);
+        cookie.setMaxAge(UserKey.TAKEN_EXPIRE);
         response.addCookie(cookie);
     }
 
-    public User getTaken(HttpServletResponse response, String taken) {
+    public User getToken(HttpServletResponse response, String token) {
 
-        if (StringUtils.isEmpty(taken)) {
+        if (StringUtils.isEmpty(token)) {
             return null;
         }
-        User user = redisHelper.get(UserPrefix.taken, taken, User.class);
+        User user = redisHelper.get(UserKey.token, token, User.class);
         if (user != null) {
             //延长用户登录时间
-            addCookie(response, taken, user);
+            addCookie(response, token, user);
         }
         return user;
     }

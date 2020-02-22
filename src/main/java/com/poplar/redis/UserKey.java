@@ -3,14 +3,14 @@ package com.poplar.redis;
 /**
  * by poplar created on 2020/2/1
  */
-public class UserPrefix extends BasePreFix {
+public class UserKey extends BaseKey {
 
     public static final int TAKEN_EXPIRE = 3600 * 24 * 15;
 
-    public UserPrefix(int expireSeconds, String prefix) {
+    public UserKey(int expireSeconds, String prefix) {
         super(expireSeconds, prefix);
     }
 
-    public static UserPrefix taken = new UserPrefix(TAKEN_EXPIRE, "tk");
+    public static UserKey token = new UserKey(TAKEN_EXPIRE, "tk");
 
 }
