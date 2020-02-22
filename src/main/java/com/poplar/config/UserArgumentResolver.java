@@ -1,5 +1,6 @@
 package com.poplar.config;
 
+import com.poplar.access.UserContext;
 import com.poplar.bean.User;
 import com.poplar.sevice.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    @Autowired
-    UserService userService;
-
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
         Class<?> parameterType = methodParameter.getParameterType();
@@ -33,25 +31,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        //获取request和response
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        String paramTaken = request.getParameter("taken");
-        String cookieTaken = getCookieValue(request, "taken");
-        if (StringUtils.isEmpty(paramTaken) && StringUtils.isEmpty(cookieTaken)) {
-            return null;
-        }
-        String taken = StringUtils.isEmpty(paramTaken) ? cookieTaken : paramTaken;
-        return userService.getTaken(response, taken);
+        return UserContext.getUser();
     }
 
-    private String getCookieValue(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
 }

@@ -1,5 +1,6 @@
 package com.poplar.controller;
 
+import com.poplar.bean.User;
 import com.poplar.sevice.UserService;
 import com.poplar.util.ResultEnvelope;
 import com.poplar.vo.LoginVo;
@@ -38,5 +39,11 @@ public class UserController {
             return ResultEnvelope.success("登录成功");
         }
         return ResultEnvelope.failure();
+    }
+
+    @RequestMapping(value = "/info")
+    @ResponseBody
+    public ResultEnvelope<User> info(User user){
+        return ResultEnvelope.success(user);
     }
 }
