@@ -78,7 +78,7 @@ public class SedKillController implements InitializingBean {
             return ResultEnvelope.failure(ResultEnum.SEDKILL_OVER);
         }
         //判断是否重复秒杀
-        SedKillOrder order = null;//orderService.getSedKillOrderByUserIdGoodsId(user.getId(), goodsId);
+        SedKillOrder order = orderService.getSedKillOrderByUserIdGoodsId(user.getId(), goodsId);
         if (order != null) {
             return ResultEnvelope.failure(ResultEnum.REPEAT_SEDKILL);
         }
@@ -180,7 +180,7 @@ public class SedKillController implements InitializingBean {
         if (user == null) {
             return ResultEnvelope.failure(ResultEnum.USER_NOT_LOGIN);
         }
-        boolean result = true;//sedKillService.checkVerifyCode(user, goodsId, verifyCode);
+        boolean result = sedKillService.checkVerifyCode(user, goodsId, verifyCode);
         if (!result) {
             return ResultEnvelope.failure(ResultEnum.VERIFYCODE_ERROR);
         }
